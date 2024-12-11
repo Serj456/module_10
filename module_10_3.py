@@ -5,58 +5,60 @@ from random import randint
 
 lock = threading.Lock()
 
+
 class Bank(threading.Thread):
 
-    def __init__(self, balance = 0):
+    def __init__(self, balance=500):
         threading.Thread.__init__(self)
         self.balance = balance
 
     def deposit(self):
-        lock.acquire()
-        transaction = 100
-        for i in range(1,transaction):
-            dep = randint(50,500)
-            self.balance = self.balance + dep
-            if self.balance >= 500 and lock.locked():
-                lock.release()
-            print(f'Пополнение: {dep}. Баланс: {self.balance}')
-            
-        time.sleep(0.001)
 
-    def take(self):
-        lock.acquire()
+
         transaction = 100
         for i in range(1, transaction):
-            take_ = randint(50,500)
+            lock.acquire()
+
+            dep = randint(50, 500)
+            self.balance = self.balance + dep
+            print(f'Пополнение: {dep}. Баланс: {self.balance}')
+            lock.release()
+            if self.balance >= 500 and lock.locked():
+                lock.release()
+            else:
+                pass
+
+            time.sleep(0.001)
+
+    def take(self):
+
+
+        transaction = 100
+        for i in range(1, transaction):
+            lock.acquire()
+
+            take_ = randint(50, 500)
             print(f'Запрос на {take_}')
             if self.balance >= take_:
                 self.balance = self.balance - take_
                 print(f"Снятие {take_}. Баланс: {self.balance}")
+                lock.release()
             elif self.balance < take_:
-                if lock.locked() == True:
-                    print(f"Запрос отклонен, недостаточно средств")
-                    break
+
                 print(f"Запрос отклонен, недостаточно средств")
-                lock.acquire()
-            
+                lock.release()
 
-
-
-
-
-
+            time.sleep(0.001)
 
 
 
 bk = Bank()
-th1 = threading.Thread(target=Bank.deposit, args=(bk,), daemon=True)
-th2 = threading.Thread(target=Bank.take, args=(bk,),daemon=True)
+th1 = threading.Thread(target=Bank.deposit, args=(bk,))
+th2 = threading.Thread(target=Bank.take, args=(bk,))
 
 th1.start()
 th2.start()
 th1.join()
 th2.join()
-
-
 
 print(f"Итоговый баланс: {bk.balance}")
