@@ -32,6 +32,7 @@ class Bank(threading.Thread):
                 print(f"Снятие {take_}. Баланс: {self.balance}")
             elif self.balance < take_:
                 if lock.locked() == True:
+                    print(f"Запрос отклонен, недостаточно средств")
                     break
                 print(f"Запрос отклонен, недостаточно средств")
                 lock.acquire()
