@@ -12,6 +12,7 @@ class Bank(threading.Thread):
         self.balance = balance
 
     def deposit(self):
+        lock.acquire()
         transaction = 100
         for i in range(1,transaction):
             dep = randint(50,500)
@@ -19,10 +20,11 @@ class Bank(threading.Thread):
             if self.balance >= 500 and lock.locked():
                 lock.release()
             print(f'Пополнение: {dep}. Баланс: {self.balance}')
-            transaction -= 1
+            
         time.sleep(0.001)
 
     def take(self):
+        lock.acquire()
         transaction = 100
         for i in range(1, transaction):
             take_ = randint(50,500)
@@ -36,7 +38,7 @@ class Bank(threading.Thread):
                     break
                 print(f"Запрос отклонен, недостаточно средств")
                 lock.acquire()
-            transaction -= 1
+            
 
 
 
